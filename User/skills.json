@@ -1,0 +1,27 @@
+{
+    "allProgrammingSkills": [
+        {"skill": "Tasting", "latex": "Tasting", "area": ["generic", "food", "sensing"], "alias": [], "is_case_sensitive": false},
+        {"skill": "Eating", "latex": "Eating", "area": ["generic", "food"], "alias": [], "is_case_sensitive": false},
+        {"skill": "Consuming", "latex": "Consuming", "area": ["generic", "food"], "alias": [], "is_case_sensitive": false},
+        {"skill": "Smelling", "latex": "Smelling", "area": ["generic", "food", "sensing"], "alias": [], "is_case_sensitive": false},
+        {"skill": "Ravening", "latex": "Ravening", "area": ["food"], "alias": [], "is_case_sensitive": false}
+    ],
+    "allHardwareSkills": [
+        {"skill": "Jar opening", "latex": "Jar~opening", "area": ["generic", "hardware", "food"], "alias": [], "is_case_sensitive": false},
+        {"skill": "Food boxes disassembling", "latex": "Food~boxes~disassembling", "area": ["generic", "hardware", "food"], "alias": ["box"], "is_case_sensitive": false},
+        {"skill": "Dishes preparing", "latex": "Dishes~preparing", "area": ["generic", "hardware", "food"], "alias": [], "is_case_sensitive": false}
+    ],
+    "allOtherSkills": [
+        {"skill": "Honey integration testing", "latex": "Honey~integration~testing", "area": ["integration", "sensing", "testing"], "alias": ["integration"], "is_case_sensitive": false},
+        {"skill": "Honey unit testing", "latex": "Honey~unit~testing", "area": ["testing"], "alias": ["unit"], "is_case_sensitive": false},
+        {"skill": "Honey end-to-end testing", "latex": "Honey end-to-end testing", "area": ["generic", "testing"], "alias": [], "is_case_sensitive": false},
+        {"skill": "Honey smell testing", "latex": "Honey~smell~testing", "area": ["testing", "sensing"], "alias": [], "is_case_sensitive": false},
+        {"skill": "Honey-to-mouth automation", "latex": "Honey-to-mouth automation", "area": ["generic", "testing", "automation"], "alias": [], "is_case_sensitive": false}
+    ],
+    "allSoftSkills": [
+        {"skill": "Honey-oriented", "latex": "Honey-oriented", "area": ["soft", "generic"], "alias": ["oriented"], "is_case_sensitive": false},
+        {"skill": "Food goal-driven", "latex": "Food goal-driven", "area": ["soft", "generic"], "alias": ["driven"], "is_case_sensitive": false},
+        {"skill": "Being cute and charming for conflict resolution", "latex": "Being cute and charming for conflict resolution", "area": ["soft"], "alias": ["conflict resolution"], "is_case_sensitive": false},
+        {"skill": "Attention to smell details", "latex": "Attention to smell details", "area": ["generic", "soft"], "alias": ["details"], "is_case_sensitive": false}
+    ]
+}

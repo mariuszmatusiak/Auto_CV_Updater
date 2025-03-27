@@ -1,0 +1,32 @@
+[
+    {
+        "expiry": 1765835930,
+        "secure": true,
+        "domain": ".www.linkedin.com",
+        "httpOnly": true,
+        "value": "<Add value of the bscookie cookie HERE>",
+        "path": "/",
+        "sameSite": "None",
+        "name": "bscookie"
+    },
+    {
+        "expiry": 1765835930,
+        "secure": true,
+        "domain": ".www.linkedin.com",
+        "httpOnly": true,
+        "value": "<Add value of the li_at cookie HERE>",
+        "path": "/",
+        "sameSite": "None",
+        "name": "li_at"
+    },
+    {
+        "expiry": 1765835930,
+        "secure": true,
+        "domain": ".www.linkedin.com",
+        "httpOnly": true,
+        "value": "<Add value of the li_rm cookie HERE>",
+        "path": "/",
+        "sameSite": "None",
+        "name": "li_rm"
+    }
+]
