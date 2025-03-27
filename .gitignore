@@ -128,8 +128,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
+user_cfg.env
 env/
 venv/
 ENV/
@@ -172,3 +172,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# MacOS
+.DS_Store
+
+# User files
+Logs/*.txt
+.vscode/

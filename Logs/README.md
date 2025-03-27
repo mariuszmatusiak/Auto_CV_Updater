@@ -1,0 +1,1 @@
+A directory to store output log *.txt files from the shell cron job.
