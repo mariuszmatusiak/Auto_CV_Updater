@@ -15,22 +15,29 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 #
-# Shell script to automatically update target data in CVs by calling updatecv.py with cron.
+# Shell script to be called automatically by cron to invoke updatecv.py.
+#
+# Example:
+# 0 22 * * * /path/to/the/cloned/auto_cv_repo/cronjob.sh
 #
 # Version 1.0, 2025-03-27 - The initial version, contains CLI and LinkedIn support. 
 #
 
-echo "==== CV Updater job started ===="
+echo "==== Auto CV Updater job started ===="
 
+# Provide the path to your Python executable here:
 alias python="/opt/homebrew/bin/python3.11"
 timestamp=`date "+%Y%m%d_%H%M%S"`
-logfile="Logs/updatecv_log_${timestamp}.txt"
+auto_cv_updater_dir=$(dirname $0)
+# A default path for logs
+logfile="${auto_cv_updater_dir}/Logs/updatecv_log_${timestamp}.txt"
+# Define extra arguments for updatecv.py, e.g. -s to sync with pages
+extra_arguments="-s -env=${auto_cv_updater_dir}/user_cfg.env -sj=${auto_cv_updater_dir}/User/skills_user.json -lc=${auto_cv_updater_dir}/User/linkedin_cookies_user.json"
 
-cd "${HOME}/Projects/CV_Updater"
-echo python updatecv.py -s 2>&1 | tee ${logfile}
-python updatecv.py -s 2>&1 | tee -a ${logfile}
-# If above failed try for the second time (safari webdriver error)
+echo "Executing python ${auto_cv_updater_dir}/updatecv.py ${extra_arguments}..." 2>&1 | tee ${logfile}
+python ${auto_cv_updater_dir}/updatecv.py ${extra_arguments} 2>&1 | tee -a ${logfile}
+# If above execution fails try for the second time (safari webdriver error: https://github.com/SeleniumHQ/selenium/issues/15160)
 echo Trying for the second time... | tee -a ${logfile}
-python updatecv.py -s 2>&1 | tee -a ${logfile}
+python ${auto_cv_updater_dir}/updatecv.py ${extra_arguments} 2>&1 | tee -a ${logfile}
 
-echo "==== CV Updater job finished ===="
+echo "==== Auto CV Updater job finished ===="
