@@ -29,7 +29,11 @@ WEBDRIVER_PAGE_LOAD_SLEEP_TIME = 5
 #TODO Add support for other webdrivers
 
 class WebDriver(Enum):
-    WEBDRIVER_SAFARI = 1
+    WEBDRIVER_SAFARI = 0
+    WEBDRIVER_FIREFOX = 1
+    WEBDRIVER_CHROME = 2
+    WEBDRIVER_EDGE = 3
+    WEBDRIVER_IE = 4
 
 class Job:
     """Job class.
@@ -64,6 +68,14 @@ class IJobsFetcherService(metaclass=ABCMeta):
     Args:
         ABC (ABCMeta): Standard Python Abstract Base Class.
     """
+
+    def __init__(self, webDriver: WebDriver=WebDriver.WEBDRIVER_SAFARI):
+        """_summary_
+
+        Args:
+            webDriver (WebDriver, optional): _description_. Defaults to WebDriver.WEBDRIVER_SAFARI.
+        """
+        self.webDriver = webDriver
 
     @abstractmethod
     def getSavedJobs(self) -> list[Job]:

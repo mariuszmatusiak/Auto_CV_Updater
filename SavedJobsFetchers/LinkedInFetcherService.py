@@ -31,6 +31,7 @@ import json, os, time, re
 
 # LinkedIn HTML & CSS fields
 LINKEDIN_MY_SAVED_JOBS_PAGE = "https://www.linkedin.com/my-items/saved-jobs/?cardType=SAVED&start=<PAGE>0"
+LINKEDIN_MAIN_PAGE = "https://www.linkedin.com/"
 LINKEDIN_SIGNIN_BUTTON_CSS_SELECTOR = ".btn__primary--large"
 LINKEDIN_SIGNIN_USERNAME_ID = "username"
 LINKEDIN_SIGNIN_PASSWORD_ID = "password"
@@ -56,10 +57,10 @@ class LinkedInFetcherService(IJobsFetcherService):
             password (str): LinkedIn password. Defaults to None.
             cookiesFileDir (str): Path to the cookies JSON file containing LinkedIn authentication cookies.
         """
+        super().__init__(webDriver=webDriver)
         self.username = username if username is not None else input("Enter LinkedIn username: ")
         self.password = password if password is not None else input("Enter LinkedIn password: ")
         self.cookiesFileDir = cookiesFileDir if cookiesFileDir is not None else input("Enter path to the LinkedIn cookies file: ")
-        self.webDriver = webDriver
 
     def parsePageForSavedJobs(self, savedJobsList: list, htmlPage: str):
         mySavedJobsSoup = BeautifulSoup(htmlPage, "html.parser") #lxml?
@@ -95,13 +96,17 @@ class LinkedInFetcherService(IJobsFetcherService):
         print("Initializing webdriver...")
         if self.webDriver == WebDriver.WEBDRIVER_SAFARI:
             browser = webdriver.Safari(service=Service(executable_path=WEBDRIVER_SAFARI_PATH))
+        elif self.webDriver == WebDriver.WEBDRIVER_FIREFOX:
+            browser = webdriver.Firefox()
         else:
             print("WebDriver not supported yet.")
             return
-
+        print(f"Webdriver {browser.name} initialized. Visiting LinkedIn...")
+        browser.get(LINKEDIN_MAIN_PAGE) # We must first visit the page before adding cookies (cookie-averse document error)
         time.sleep(WEBDRIVER_SETUP_SLEEP_TIME)
         # Load cookies
         print("Loading cookies...")
+        browser.delete_all_cookies()
         with open(self.cookiesFileDir, "r") as f:
             cookies = json.load(fp=f)
             for cookie in cookies:
