@@ -38,6 +38,8 @@ class WebDriver(Enum):
 class Job:
     """Job class.
     """
+    VISA_REQUIRED_COUNTRIES = ["United States", "USA", "U.S.", "U.S.A.", "US", "United Kingdom", "UK", "U.K.", "Canada", "Australia", "New Zealand", "Switzerland"]
+
     def __init__(self, company: str, job: str, location: str, url: str, 
                     details: str = None, letterAddress: str = None, letterRecipient: str = None, isVisaRequired: str = None):
         """Job class constructor.
@@ -57,9 +59,9 @@ class Job:
         self.location = location
         self.url = url
         self.details = details
-        self.letterAddress = letterAddress
-        self.letterRecipient = letterRecipient
-        self.isVisaRequired = isVisaRequired
+        self.letterAddress = location if letterAddress is None else letterAddress
+        self.letterRecipient = company if letterRecipient is None else letterRecipient
+        self.isVisaRequired = isVisaRequired if isVisaRequired is not None else "1" if location in Job.VISA_REQUIRED_COUNTRIES else "0"
 
 class IJobsFetcherService(metaclass=ABCMeta):
     """An interface to fetch jobs through various job portals.

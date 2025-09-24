@@ -27,6 +27,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.safari.service import Service
 from selenium.common.exceptions import NoSuchElementException
+from urllib3.exceptions import ReadTimeoutError
 import json, os, time, re
 
 # LinkedIn HTML & CSS fields
@@ -40,7 +41,9 @@ LINKEDIN_SAVEDJOBS_LIST_XP = "/html/body/div[6]/div[3]/div/main/section/div/div[
 LINKEDIN_SAVEDJOBS_LIST_CSS = ".ilpSrejhJlrdxFOYbBAZVTWFlYDOyjAUKPGVo"
 LINKEDIN_SAVEDJOBS_COMPANY_CSS = "t-14 t-black t-normal"
 LINKEDIN_SAVEDJOBS_LOCATION_CSS = "t-14 t-normal"
-LINKEDIN_JOB_DETAILS_ID = "job-details"
+LINKEDIN_JOB_DETAILS_DIV_ID = "job-details" # Probably not supported div anymore
+LINKEDIN_JOB_DETAILS_PARAGRAPH_XPATH = "/html/body/div/div[2]/div[2]/div[2]/div/main/div/div/div[1]/div/div/div/div[4]/div/div/p" # Optional alternative
+LINKEDIN_JOB_DETAILS_DIV_DATA_VIEW_NAME = {"data-view-name": "job-detail-page"}
 
 class LinkedInFetcherService(IJobsFetcherService):
     """LinkedIn Fetching Service class. Implements the IJobsFetcherService interface.
@@ -84,11 +87,18 @@ class LinkedInFetcherService(IJobsFetcherService):
 
     def parseJobPageDetails(self, htmlPage: str) -> str:
         jobPageDetailsSoup = BeautifulSoup(htmlPage, "html.parser")
-        htmlJobDetails = jobPageDetailsSoup.find(name="div", attrs={"id": LINKEDIN_JOB_DETAILS_ID})
+        jobDetailsStrings = ["No details found."]
+        # Search using legacy approach
+        htmlJobDetails = jobPageDetailsSoup.find(name="div", attrs={"id": LINKEDIN_JOB_DETAILS_DIV_ID})
         if htmlJobDetails:
             jobDetailsStrings = htmlJobDetails.strings
-        else:
-            jobDetailsStrings = ["No details provided."]
+            return "\n".join(jobDetailsStrings)
+        # Search using new approach
+        htmlJobDetails = jobPageDetailsSoup.find(name="div", attrs=LINKEDIN_JOB_DETAILS_DIV_DATA_VIEW_NAME)
+        if htmlJobDetails: 
+            jobDetailsStrings = htmlJobDetails.stripped_strings
+            return "\n".join(jobDetailsStrings)
+        # No known approaches worked
         return "\n".join(jobDetailsStrings)
 
     def getSavedJobs(self) -> list[Job]:
@@ -148,12 +158,15 @@ class LinkedInFetcherService(IJobsFetcherService):
 
         # Get job details
         for job in savedJobs:
-            browser.get(job.url)
-            time.sleep(WEBDRIVER_PAGE_LOAD_SLEEP_TIME)
-            job.details = self.parseJobPageDetails(browser.page_source)
-            job.letterRecipient = job.company # TODO - to update for more data
-            job.letterAddress = job.location # TODO - to update for more data
-            job.isVisaRequired = "0" # TODO - to update for more data
+            try:
+                browser.get(job.url)
+                time.sleep(WEBDRIVER_PAGE_LOAD_SLEEP_TIME)
+                job.details = self.parseJobPageDetails(browser.page_source)
+                # job.letterRecipient = job.company # TODO - to update for more data
+                # job.letterAddress = job.location # TODO - to update for more data
+                # job.isVisaRequired = "0" # TODO - to update for more data
+            except ReadTimeoutError as e:
+                print(f"Read timeout error on fetching {job.job}")
 
         browser.close()
         browser.quit()
