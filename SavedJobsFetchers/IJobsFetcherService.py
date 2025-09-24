@@ -29,11 +29,17 @@ WEBDRIVER_PAGE_LOAD_SLEEP_TIME = 5
 #TODO Add support for other webdrivers
 
 class WebDriver(Enum):
-    WEBDRIVER_SAFARI = 1
+    WEBDRIVER_SAFARI = 0
+    WEBDRIVER_FIREFOX = 1
+    WEBDRIVER_CHROME = 2
+    WEBDRIVER_EDGE = 3
+    WEBDRIVER_IE = 4
 
 class Job:
     """Job class.
     """
+    VISA_REQUIRED_COUNTRIES = ["United States", "USA", "U.S.", "U.S.A.", "US", "United Kingdom", "UK", "U.K.", "Canada", "Australia", "New Zealand", "Switzerland"]
+
     def __init__(self, company: str, job: str, location: str, url: str, 
                     details: str = None, letterAddress: str = None, letterRecipient: str = None, isVisaRequired: str = None):
         """Job class constructor.
@@ -53,9 +59,9 @@ class Job:
         self.location = location
         self.url = url
         self.details = details
-        self.letterAddress = letterAddress
-        self.letterRecipient = letterRecipient
-        self.isVisaRequired = isVisaRequired
+        self.letterAddress = location if letterAddress is None else letterAddress
+        self.letterRecipient = company if letterRecipient is None else letterRecipient
+        self.isVisaRequired = isVisaRequired if isVisaRequired is not None else "1" if location in Job.VISA_REQUIRED_COUNTRIES else "0"
 
 class IJobsFetcherService(metaclass=ABCMeta):
     """An interface to fetch jobs through various job portals.
@@ -64,6 +70,14 @@ class IJobsFetcherService(metaclass=ABCMeta):
     Args:
         ABC (ABCMeta): Standard Python Abstract Base Class.
     """
+
+    def __init__(self, webDriver: WebDriver=WebDriver.WEBDRIVER_SAFARI):
+        """_summary_
+
+        Args:
+            webDriver (WebDriver, optional): _description_. Defaults to WebDriver.WEBDRIVER_SAFARI.
+        """
+        self.webDriver = webDriver
 
     @abstractmethod
     def getSavedJobs(self) -> list[Job]:

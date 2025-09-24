@@ -129,7 +129,6 @@ celerybeat.pid
 
 # Environments
 .venv
-user_cfg.env
 env/
 venv/
 ENV/
@@ -179,3 +178,4 @@ cython_debug/
 # User files
 Logs/*.txt
 .vscode/
+user_*

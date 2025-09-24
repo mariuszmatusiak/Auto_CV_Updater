@@ -37,6 +37,8 @@ SCORE_MULTIPLIER_SKILL_MENTIONED = 5
 SCORE_MULTIPLIER_SKILL_ALIAS_MENTIONED = 4
 SCORE_MULTIPLIER_SKILL_AREA_MENTIONED = 1
 
+SUPPORTED_WEBBROWSERS = ("safari", "firefox")
+
 class LaTeXResumeFields(Enum):
     """Enum class of user-defined LaTeX commands to provide job-specific information.
     File: 12_recipients.tex
@@ -65,10 +67,14 @@ def main():
     parser.add_argument("-sf",  "--skills_file", help="Specify the name of the LaTeX CV skills file in the CV-Templates/data/ directory to be used.", required=False, default="04_skills.tex")
     parser.add_argument("-sj",  "--skills_json", help="Specify the path to the JSON skills file to be used.", required=False, default=os.path.join("User", "skills.json"))
     parser.add_argument("-lc",  "--linkedin_cookies", help="Specify the path to the JSON file with LinkedIn authentication cookies.", required=False, default=os.path.join("User", "linkedin_cookies.json"))
+    parser.add_argument("-b",   "--browser", help="Specify the web browser to use. Default=%(default)s", choices=SUPPORTED_WEBBROWSERS, default=SUPPORTED_WEBBROWSERS[0])
     args = parser.parse_args()
     load_dotenv(args.environment)
 
-    cv_dir = os.path.join(os.getenv("CV_DIR"))
+    cv_dir = os.getenv("CV_DIR")
+    if not os.path.isdir(cv_dir):
+        print(f"{cv_dir} directory is not valid.")
+        return
     recipients_latex_file = os.path.join(cv_dir, "data", args.recipient_file)
     skills_latex_file = os.path.join(cv_dir, "data", args.skills_file)
     skills_json_file = args.skills_json
@@ -100,7 +106,8 @@ def checkMySavedJobs(args) -> list[Job]:
     fetcherService = LinkedInFetcherService(
         username=os.getenv("LIN_LOGIN"),
         password=os.getenv("LIN_KEY"),
-        cookiesFileDir=args.linkedin_cookies)
+        cookiesFileDir=args.linkedin_cookies,
+        webDriver=WebDriver(SUPPORTED_WEBBROWSERS.index(args.browser)))
     savedJobs.extend(fetcherService.getSavedJobs())
     # TODO Add other services if needed like Indeed, pracuj.pl, etc.
     return savedJobs
@@ -223,9 +230,9 @@ def rebuildCVs(cv_dir : str, recipient_file: str) -> None:
     jobName = getField(LaTeXResumeFields.POSITION_NAME, recipient_file)
     jobNameLC = escapeFileSystemCharacters(jobName.lower())
     date = datetime.now().strftime("%Y%m%d")
-    cmd = ['gmake', 'all', 
+    cmd = [os.getenv("MAKE_BIN"), 'all',
            f'company={companyNameLC}',
-           f'location={locationNameLC}', 
+           f'location={locationNameLC}',
            f'job={jobNameLC}',
            f'timestamp={date}'
     ]
