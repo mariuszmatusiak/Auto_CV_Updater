@@ -25,6 +25,7 @@ from enum import Enum
 # WebDriver configurations
 WEBDRIVER_SAFARI_PATH = "/usr/bin/safaridriver"
 WEBDRIVER_CHROMIUM_PATH = "/usr/bin/chromium-browser"
+WEBDRIVER_CHROMIUM_DRIVER_PATH = "/usr/bin/chromedriver"
 WEBDRIVER_SETUP_SLEEP_TIME = 10
 WEBDRIVER_PAGE_LOAD_SLEEP_TIME = 5
 #TODO Add support for other webdrivers

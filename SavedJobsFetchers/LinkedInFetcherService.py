@@ -111,7 +111,7 @@ class LinkedInFetcherService(IJobsFetcherService):
         elif self.webDriver == WebDriver.WEBDRIVER_CHROMIUM:
             chromium_options = webdriver.ChromeOptions()
             chromium_options.binary_location = WEBDRIVER_CHROMIUM_PATH
-            browser = webdriver.Chrome(options=chromium_options)
+            browser = webdriver.Chrome(service=Service(executable_path=WEBDRIVER_CHROMIUM_DRIVER_PATH), options=chromium_options)
         else:
             print("WebDriver not supported yet.")
             return
