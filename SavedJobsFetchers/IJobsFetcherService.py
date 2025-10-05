@@ -24,6 +24,7 @@ from enum import Enum
 
 # WebDriver configurations
 WEBDRIVER_SAFARI_PATH = "/usr/bin/safaridriver"
+WEBDRIVER_CHROMIUM_PATH = "/usr/bin/chromium-browser"
 WEBDRIVER_SETUP_SLEEP_TIME = 10
 WEBDRIVER_PAGE_LOAD_SLEEP_TIME = 5
 #TODO Add support for other webdrivers
@@ -31,9 +32,10 @@ WEBDRIVER_PAGE_LOAD_SLEEP_TIME = 5
 class WebDriver(Enum):
     WEBDRIVER_SAFARI = 0
     WEBDRIVER_FIREFOX = 1
-    WEBDRIVER_CHROME = 2
-    WEBDRIVER_EDGE = 3
-    WEBDRIVER_IE = 4
+    WEBDRIVER_CHROMIUM = 2
+    WEBDRIVER_CHROME = 3
+    WEBDRIVER_EDGE = 4
+    WEBDRIVER_IE = 5
 
 class Job:
     """Job class.

@@ -37,7 +37,7 @@ SCORE_MULTIPLIER_SKILL_MENTIONED = 5
 SCORE_MULTIPLIER_SKILL_ALIAS_MENTIONED = 4
 SCORE_MULTIPLIER_SKILL_AREA_MENTIONED = 1
 
-SUPPORTED_WEBBROWSERS = ("safari", "firefox")
+SUPPORTED_WEBBROWSERS = ("safari", "firefox", "chromium")
 
 class LaTeXResumeFields(Enum):
     """Enum class of user-defined LaTeX commands to provide job-specific information.
