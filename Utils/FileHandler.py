@@ -1,6 +1,6 @@
 # Auto CV Updater - automatize your CV modifications
-# Copyright (C) 2025  Mariusz Matusiak <mariusz.m.matusiak@gmail.com>
-# 
+# Copyright (C) 2026 Mariusz Matusiak <coffeedrivenengineer@gmail.com>
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published
 # by the Free Software Foundation, either version 3 of the License, or
@@ -20,10 +20,32 @@
 # Version 1.0, 2025-03-27 - The initial version
 #
 
-import os, json
+import os, json, logging
+logger = logging.getLogger(__name__)
 
 # Supports Windows, MacOS and OneDrive reserved chatecters
-FILE_SYSTEM_CHARS_TO_ESCAPE = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*", ",", " ", "(", ")", "[", "]", "{", "}", "&", "#", "."]
+FILE_SYSTEM_CHARS_TO_ESCAPE_TRANSTABLE = str.maketrans({
+    "<": "",
+    ">": "",
+    ":": "_",
+    "\"": "_",
+    "/": "_",
+    "\\": "_",
+    "|": "_",
+    "?": "_",
+    "*": "_",
+    ",": "_",
+    " ": "_",
+    "(": "",
+    ")": "",
+    "[": "",
+    "]": "",
+    "{": "",
+    "}": "",
+    "&": "_",
+    "#": "_",
+    ".": "_"
+})
 
 def readFile(path: str):
     fileContent = ""
@@ -31,7 +53,7 @@ def readFile(path: str):
         with open(path, "r") as file:
             fileContent = file.read()
     else:
-        print(f"File {path} does not exists!")
+        logger.error(f"File {path} does not exists!")
     return fileContent
 
 def readJsonFile(path: str):
@@ -40,15 +62,25 @@ def readJsonFile(path: str):
         with open(path, "r") as file:
             jsonFileContent = json.load(file)
     else:
-        print(f"File {path} does not exists!")
+        logger.error(f"File {path} does not exists!")
     return jsonFileContent
+
+def writeJsonFile(path: str, content):
+    with open(path, "w") as file:
+        json.dump(content, fp=file)
 
 def writeFile(path: str, content: str):
     with open(path, "w") as file:
         file.write(content)
 
 def escapeFileSystemCharacters(text: str):
-    newText = text
-    for ch in FILE_SYSTEM_CHARS_TO_ESCAPE:
-        newText = newText.replace(ch, "_")
-    return newText
+    return text.translate(FILE_SYSTEM_CHARS_TO_ESCAPE_TRANSTABLE)
+
+def fileExists(filePath: str):
+    return os.path.isfile(filePath)
+
+def dirExists(dirPath: str):
+    return os.path.isdir(dirPath)
+
+def pathExists(path: str):
+    return os.path.exists(path)

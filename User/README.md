@@ -41,9 +41,9 @@ The skill.json file contains a database of a user's skills which are used by the
 where:
 - `skillsSectionNameAInLatex` is the skill section name defined in \<CV-Templates\>/data/04_skills.tex as  `\newcommand\skillsSectionNameAInLatex{...}`
 - `skill` is a dictionary key for the skill text used in parsing a job description
-- `latex` is a dictionary key for the LaTeX-compatible skill text used in resume files, e.g. containing '~', superscripts, or a math environment 
+- `latex` is a dictionary key for the LaTeX-compatible skill text used in resume files, e.g. containing '~', superscripts, or a math environment
 - `area` is a dictionary key for the list of common tags, which can be used to include all area-related skills. Useful with the `-sa` parameter. The "generic" tag shall be used to force mentioning the specific skill in a resume, even if it does not appear in the job description
 - `alias` is a dictionary key for the list of alternative skill names
 - `is_case_sensitive` is a dictionary key for a boolean value, used to specify if the skill shall be searched in the job description matching case
 
-Copyright (c) 2025 Mariusz Matusiak
+Copyright (C) 2026 Mariusz Matusiak
