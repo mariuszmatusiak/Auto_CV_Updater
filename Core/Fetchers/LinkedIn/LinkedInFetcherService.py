@@ -64,7 +64,7 @@ class LinkedInFetcherService(IJobsFetcherService):
     Args:
         IJobsFetcherService (_type_): interface
     """
-    def __init__(self, username: str=None, password: str=None, cookiesFileDir: str = LINKEDIN_DEFAULT_COOKIE_FILE):
+    def __init__(self, username: str=None, password: str=None, cookiesFileDir: str = LINKEDIN_DEFAULT_COOKIE_FILE, headless: bool = False):
         """Create a LinkedIn Fetching service.
 
         Args:
@@ -77,6 +77,7 @@ class LinkedInFetcherService(IJobsFetcherService):
         self.password = password
         self.cookiesFileDir = cookiesFileDir
         self.browser = None
+        self.headless = headless
 
     def __del__(self):
         del self.browser
@@ -84,7 +85,7 @@ class LinkedInFetcherService(IJobsFetcherService):
     def _signIn(self, storeCookies=True):
         resultSuccess = False
         logger.info(f"Opening {LINKEDIN_MAIN_PAGE}...")
-        self.browser = WebBrowser(SUPPORTED_WEBBROWSERS.FIREFOX)
+        self.browser = WebBrowser(SUPPORTED_WEBBROWSERS.FIREFOX, self.headless)
         self.browser.visit(LINKEDIN_MAIN_PAGE) # We must first visit the main page before adding cookies (cookie-averse document error)
         self.browser.addCookiesFromFile(self.cookiesFileDir) # Add cookies first and try to sign in with them
         self.browser.visit(LINKEDIN_LOGIN_PAGE) # Visit login page and check if we get redirected to post login feed page

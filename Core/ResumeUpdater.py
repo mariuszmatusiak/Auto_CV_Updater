@@ -66,31 +66,36 @@ class ResumeUpdater:
         logger.info(f"LaTeX -> Setting {field} to {argument}.")
         writeFile(out_file, updatedContent)
 
+    def _toLaTeXString(arg: str, mention: bool = False):
+        LATEX_RESERVED_CHARS_TRANSTABLE = str.maketrans({
+            "/": "~",
+            "#": "\\#"
+        })
+        latexValidArg = arg.strip().translate(LATEX_RESERVED_CHARS_TRANSTABLE)
+        if latexValidArg.count(" ") == 1:
+            latexValidArg = latexValidArg.replace(" ", "~")
+        if mention:
+            latexValidArg += "/1"
+        return f"{{{latexValidArg}}}"
+
     def _updateSelectedSkills(self, jobDetails: str):
         logger.info("Highlighting selected skills according to the job details.")
-        skills = readJsonFile(self.skills_json_file)
-        if skills is None:
+        jsonSkills = readJsonFile(self.skills_json_file)
+        if jsonSkills is None:
             # Nothing to do, return
             return
         else:
             # Erase file content
-            f = open(self.skills_latex_file, "w")
-            f.close()
-            for skillSection in skills.keys():
-                logger.info(f"Updating section {skillSection}...")
-                skillDictList = []
-                # skillSection = skills[section.value]
-                for skill in skills[skillSection]:
-                    skillMentioned = self.skillAnalyzer.isSkillInJobDescription(skill=skill, jobDescription=jobDetails)
-                    skillLatex = skill["latex"] + "/1" if skillMentioned > 0 else skill["latex"]
-                    skillLatex = "{" + skillLatex + "}"
-                    skillDictList.append({"latex": skillLatex, "score": skillMentioned})
-                sortedSkillDictList = sorted(skillDictList, key=lambda x: x["score"], reverse=True)
-                sortedSkillList = [x["latex"] for x in sortedSkillDictList]
-                with open(self.skills_latex_file, "a") as file:
-                    file.write("\\newcommand\\" + skillSection + "{\n")
-                    file.write(",\n".join(sortedSkillList))
-                    file.write("}\n\n")
+            with open(self.skills_latex_file, "w") as skillsLaTeXFileHandler:
+                for skillSection in jsonSkills.keys():
+                    sortedSkillToScoreMap = SkillAnalyzer.getScoreSortedSkillMap(jsonSkills[skillSection], jobDetails)
+                    logger.info(f"Updating section \"{skillSection}\"...")
+                    skillsLaTeXFileHandler.write("\\newcommand\\" + skillSection + "{\n")
+                    latexSkillList = []
+                    for skillName, skillScore in sortedSkillToScoreMap.items():
+                        latexSkillList.append(ResumeUpdater._toLaTeXString(skillName, bool(skillScore)))
+                    skillsLaTeXFileHandler.write(",\n".join(latexSkillList))
+                    skillsLaTeXFileHandler.write("}\n\n")
 
     def updateCVFiles(self, jobsData: list[Job]):
         for job in jobsData:

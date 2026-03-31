@@ -33,7 +33,7 @@ auto_cv_updater_dir=$(dirname $0)
 # A default path for logs
 logfile="${auto_cv_updater_dir}/Logs/updatecv_log_${timestamp}.txt"
 # Define extra arguments for updatecv.py, e.g. -s to sync with pages
-extra_arguments="--sync -b=Firefox -sj=${auto_cv_updater_dir}/User/example_skills.json"
+extra_arguments="--sync -b=Firefox --headless -sj=${auto_cv_updater_dir}/User/example_skills.json"
 
 echo "Executing python ${auto_cv_updater_dir}/updatecv.py ${extra_arguments}..." 2>&1 | tee ${logfile}
 python ${auto_cv_updater_dir}/updatecv.py ${extra_arguments} 2>&1 | tee -a ${logfile}

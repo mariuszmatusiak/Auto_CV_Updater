@@ -22,16 +22,22 @@
 #   py -3 updatecv.py [-c=CompanyName] [-j=DSP Senior Engineer] [-l=Boston, MA] [-v=y] [-p=embedded] [-s]
 #
 
-import logging
+import logging, sys
 from enum import StrEnum
 
-class SkillDict(StrEnum):
+class Fields(StrEnum):
     SKILL = "skill"
+    AREA = "area"
+    ALIAS = "alias"
+    IS_CASE_SENSITIVE = "is_case_sensitive"
+    IS_FAVOURITE = "is_favourite"
+    LAST_USED = "last_used"
+    LVL_OF_EXPERTISE = "expertise"
 
-
+SCORE_MULTIPLIER_SKILL_FAVOURITE = sys.maxsize
 SCORE_MULTIPLIER_SKILL_MENTIONED = 5
-SCORE_MULTIPLIER_SKILL_ALIAS_MENTIONED = 4
-SCORE_MULTIPLIER_SKILL_AREA_MENTIONED = 1
+SCORE_MULTIPLIER_ALIAS_MENTIONED = 4
+SCORE_MULTIPLIER_AREA_MENTIONED = 1
 
 logger = logging.getLogger(__name__)
 
@@ -40,37 +46,63 @@ class SkillAnalyzer:
     def __init__(self):
         pass
 
-    def isSkillInJobDescription(self, skill: dict, jobDescription: str) -> int:
-        skillImportanceTotalScore = 0
-        skillAliasMentioned = 0
-        skillAreasMentioned = 0
-        skillOnlyMentioned = 0
-        incrementBy = 0
-        jobDescriptionLS = jobDescription.lower().strip()
-        # Can return immediately if marked as generic
-        logger.info(f"--- Checking skill \"{skill['skill']}\" ---")
-        if "generic" in skill["area"]:
-            logger.info(f"\tMarked as the generic skill, adding +1 to score.")
-            skillAreasMentioned += 1
-        # Primary - precise skill match including small and capital letters
-        incrementBy = jobDescription.count(skill["skill"]) if skill["is_case_sensitive"] else jobDescriptionLS.count(skill["skill"].lower())
-        logger.info(f"\t\"{skill['skill']}\" mentioned {incrementBy} times.")
-        skillOnlyMentioned += incrementBy
+    def _countPreciseMatches(jsonSillObj: dict, jobDescription: str):
+        # Primary - precise case-sensitive or non-case-sensitive skill matches.
+        if jsonSillObj[Fields.IS_CASE_SENSITIVE]:
+            count = jobDescription.count(jsonSillObj[Fields.SKILL])
+        else:
+            jobDescriptionLS = jobDescription.lower().strip()
+            count = jobDescriptionLS.count(jsonSillObj[Fields.SKILL].lower())
+        logger.info(f"- \"{jsonSillObj[Fields.SKILL]}\" mentioned {count} times.")
+        return count
+
+    def _countAliasMatches(jsonSillObj: dict, jobDescription: str):
         # Secondary - precise alias match including small and capital letters
-        for alias in skill["alias"]:
-            incrementBy = jobDescription.count(alias) if skill["is_case_sensitive"] else jobDescriptionLS.count(alias.lower())
-            logger.info(f"\tAlias \"{alias}\" mentioned {incrementBy} times.")
-            skillAliasMentioned += incrementBy
+        totalCount = 0
+        jobDescriptionLS = jobDescription.lower().strip()
+        for alias in jsonSillObj[Fields.ALIAS]:
+            if jsonSillObj[Fields.IS_CASE_SENSITIVE]:
+                count = jobDescription.count(alias)
+            else:
+                count = jobDescriptionLS.count(alias.lower())
+            logger.info(f"- \"{jsonSillObj[Fields.SKILL]}\"\'s alias \"{alias}\" mentioned {count} times.")
+            totalCount += count
+        return totalCount
+
+    def _countAreaMatches(jsonSillObj: dict, jobDescription: str):
         # Tertiary - non-precise area match ignoring small and capital letters
-        for area in skill["area"]:
+        totalCount = 0
+        jobDescriptionLS = jobDescription.lower().strip()
+        for area in jsonSillObj[Fields.AREA]:
             # Skip "generic" area
             if area == "generic":
                 continue
-            incrementBy = jobDescriptionLS.count(area.lower())
-            logger.info(f"\tArea \"{area}\" mentioned {incrementBy} times.")
-            skillAreasMentioned += incrementBy
-        skillImportanceTotalScore = (skillOnlyMentioned * SCORE_MULTIPLIER_SKILL_MENTIONED +
-                                skillAliasMentioned * SCORE_MULTIPLIER_SKILL_ALIAS_MENTIONED +
-                                skillAreasMentioned * SCORE_MULTIPLIER_SKILL_AREA_MENTIONED)
-        logger.info(f"\tScore: {skillImportanceTotalScore}.\n" + ("-" * 66))
+            count = jobDescriptionLS.count(area.lower())
+            logger.info(f"- \"{jsonSillObj[Fields.SKILL]}\"\'s area \"{area}\" mentioned {count} times.")
+            totalCount += count
+        return totalCount
+
+    def _isSkillInJobDescription(jsonSillObj: dict, jobDescription: str) -> int:
+        skillImportanceTotalScore = 0
+        # Can return immediately if marked as generic/favourite
+        logger.info(f"--- Checking skill \"{jsonSillObj[Fields.SKILL]}\" ---")
+        if "generic" in jsonSillObj[Fields.AREA] or jsonSillObj[Fields.IS_FAVOURITE]:
+            logger.info(f"- Skill \"{jsonSillObj[Fields.SKILL]}\" marked as favourite <3.")
+            skillImportanceTotalScore += SCORE_MULTIPLIER_SKILL_FAVOURITE
+        skillImportanceTotalScore += SkillAnalyzer._countPreciseMatches(jsonSillObj, jobDescription) * SCORE_MULTIPLIER_SKILL_MENTIONED
+        skillImportanceTotalScore += SkillAnalyzer._countAliasMatches(jsonSillObj, jobDescription) * SCORE_MULTIPLIER_ALIAS_MENTIONED
+        skillImportanceTotalScore += SkillAnalyzer._countAreaMatches(jsonSillObj, jobDescription) * SCORE_MULTIPLIER_AREA_MENTIONED
+        logger.info(f"--- Score: {skillImportanceTotalScore}. " + ("-" * 3))
         return skillImportanceTotalScore
+
+    def _skillSortingCallbackFunction(arg):
+        # TODO Consider also last_used and expertise fields
+        return arg[1] # return value from a key-value tupple
+
+    def getScoreSortedSkillMap(jsonSkills, jobDetails):
+        sectionSkillToScoreMap = {}
+        for skillObj in jsonSkills:
+            skillimportanceScore = SkillAnalyzer._isSkillInJobDescription(jsonSillObj=skillObj, jobDescription=jobDetails)
+            sectionSkillToScoreMap.update({skillObj[Fields.SKILL] : skillimportanceScore})
+        sortedSkillToScoreMap = dict(sorted(sectionSkillToScoreMap.items(), key=SkillAnalyzer._skillSortingCallbackFunction, reverse=True))
+        return sortedSkillToScoreMap

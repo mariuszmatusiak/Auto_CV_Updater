@@ -34,7 +34,8 @@ class JobFetcher:
         self.services.append(LinkedInFetcherService(
             username=args.services["linkedIn"]["login"],
             password=args.services["linkedIn"]["password"],
-            cookiesFileDir=args.services["linkedIn"]["cookies"]
+            cookiesFileDir=args.services["linkedIn"]["cookies"],
+            headless=args.headless
         ))
 
     def checkMySavedJobs(self) -> list[Job]:

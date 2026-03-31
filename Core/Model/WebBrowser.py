@@ -50,7 +50,8 @@ logger = logging.getLogger(__name__)
 
 class WebBrowser:
 
-    def __init__(self, selectedBrowser: SUPPORTED_WEBBROWSERS = None):
+    def __init__(self, selectedBrowser: SUPPORTED_WEBBROWSERS = None, headless: bool = False):
+        self.headless = headless
         if selectedBrowser:
             self.initialize(selectedBrowser)
 
@@ -59,19 +60,28 @@ class WebBrowser:
         self.dispose()
 
     def initialize(self, selectedBrowser: SUPPORTED_WEBBROWSERS = SUPPORTED_WEBBROWSERS.FIREFOX):
-        logger.debug("Initializing webdriver...")
+        logger.info(f"Initializing webdriver, headless mode enabled: {self.headless}.")
         if selectedBrowser == SUPPORTED_WEBBROWSERS.SAFARI:
-            self.webDriver = webdriver.Safari(service=Service(executable_path=WEBDRIVER_SAFARI_PATH))
+            safariOptions = webdriver.SafariOptions()
+            if self.headless:
+                 # TODO Add support for headless mode when available
+                 logger.warning("Headless mode in Safari not available")
+            self.webDriver = webdriver.Safari(service=Service(executable_path=WEBDRIVER_SAFARI_PATH), options=safariOptions)
         elif selectedBrowser == SUPPORTED_WEBBROWSERS.FIREFOX:
-            self.webDriver = webdriver.Firefox()
+            firefoxOptions = webdriver.FirefoxOptions()
+            if self.headless:
+                firefoxOptions.add_argument("-headless")
+            self.webDriver = webdriver.Firefox(options=firefoxOptions)
         elif selectedBrowser == SUPPORTED_WEBBROWSERS.CHROMIUM:
             chromium_options = webdriver.ChromeOptions()
+            if self.headless:
+                chromium_options.add_argument("--headless")
             chromium_options.binary_location = WEBDRIVER_CHROMIUM_PATH
             self.webDriver = webdriver.Chrome(service=Service(executable_path=WEBDRIVER_CHROMIUM_DRIVER_PATH), options=chromium_options)
         else:
             logger.error("WebDriver not supported yet.")
             self.webDriver = None
-        logger.debug(f"Webdriver {selectedBrowser} initialized.")
+        logger.info(f"Webdriver {selectedBrowser} initialized.")
 
     def visit(self, url):
         self.webDriver.get(url) # We must first visit the page before adding cookies (cookie-averse document error)

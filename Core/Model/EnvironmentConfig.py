@@ -26,7 +26,7 @@ class SUPPORTED_VARIABLES:
 
 class EnvironmentConfig:
     def __init__(self, sync: bool, skill_areas : list, recipient_file : str,
-                 skills_file : str, skills_json : str, browser: SUPPORTED_WEBBROWSERS, cv_dir : str, make_exec : str,
+                 skills_file : str, skills_json : str, browser: SUPPORTED_WEBBROWSERS, headless : bool, cv_dir : str, make_exec : str,
                  linkedInCookies):
         self.cv_dir = cv_dir
         self.sync = sync
@@ -35,6 +35,7 @@ class EnvironmentConfig:
         self.skills_file = skills_file
         self.skills_json = skills_json
         self.browser = browser
+        self.headless = headless
         self.make_exec = make_exec
         self.services = {
             "linkedIn" : {

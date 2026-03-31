@@ -67,6 +67,7 @@ class CmdLineParser:
         parser.add_argument("-sj",  "--skills_json", help="Specify the path to the JSON skills file to be used.", required=False, default=os.path.join("User", "skills.json"))
         parser.add_argument("-lc",  "--linkedin_cookies", help="Specify the path to the JSON file with LinkedIn authentication cookies.", required=False, default=os.path.join("User", "linkedin_cookies.json"))
         parser.add_argument("-b",   "--browser", help="Specify the web browser to use. Default=%(default)s", choices=SUPPORTED_WEBBROWSERS, default=SUPPORTED_WEBBROWSERS.FIREFOX)
+        parser.add_argument("-hl",  "--headless", help="Specify if you want to run process in the background (no display)", action="store_true")
         args = parser.parse_args()
         # Store job details
         self.jobDetails = Job(
@@ -95,6 +96,7 @@ class CmdLineParser:
             skills_file=os.path.join(cv_dir, "data", args.skills_file),
             skills_json=args.skills_json,
             browser=args.browser,
+            headless=args.headless,
             cv_dir=cv_dir,
             make_exec=make_exec,
             linkedInCookies=args.linkedin_cookies
