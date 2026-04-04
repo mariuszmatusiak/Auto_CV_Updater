@@ -107,14 +107,31 @@ class WebBrowser:
         logger.debug(f"Getting cookie {name}")
         return self.webDriver.get_cookie(name)
 
-    def getField(self, fieldId: str = None, fieldCssSelector: str = None):
+    def getField(self, fieldId: str = None, fieldCssSelector: str = None, fieldName : str = None, fieldType : str = None, index : int = 0):
         field = None
         if fieldId:
-            field = self.webDriver.find_element(By.ID, fieldId)
+            fields = self.webDriver.find_elements(By.ID, fieldId)
+            if len(fields > 1):
+                logger.warning(f"There are multiple web elements with ID {fieldId}. Returning fields[{index}]")
+            field = fields[index]
+        elif fieldName:
+            fields = self.webDriver.find_elements(By.NAME, fieldName)
+            if len(fields > 1):
+                logger.warning(f"There are multiple web elements with NAME {fieldName}. Returning fields[{index}]")
+            field = fields[index]
+        elif fieldType:
+            fields = self.webDriver.find_elements(By.TAG_NAME, fieldType)
+            if len(fields > 1):
+                logger.warning(f"There are multiple web elements with TYPE {fieldName}. Returning fields[{index}]")
+            field = fields[index]
         elif fieldCssSelector:
-            field = self.webDriver.find_element(By.CSS_SELECTOR, fieldCssSelector)
+            fields = self.webDriver.find_elements(By.CSS_SELECTOR, fieldCssSelector)
+            if len(fields > 1):
+                logger.warning(f"There are multiple web elements with TYPE {fieldName}. Returning fields[{index}]")
+            field = fields[index]
         else:
             logger.error("No field ID or CSS selector provided.")
+            field = self.webDriver.find
         return field
 
     def clickField(self, fieldId: str = None, fieldCssSelector: str = None, wait=True):

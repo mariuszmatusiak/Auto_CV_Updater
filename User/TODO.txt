@@ -1,0 +1,9 @@
+TODO:
+- move latex field from JSON to a dedicated convertToLatex function
+- use alias if alias is found
+- expand skillFinder function that will parse text with:
+    - "<skill>,"
+    - "<skill>."
+    - "<skill> "
+    - " <1-letter-skill> "
+    - etc. occurences
