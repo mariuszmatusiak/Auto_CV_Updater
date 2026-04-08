@@ -53,7 +53,7 @@ LINKEDIN_JOB_DETAILS_PAGE_DESCRIPTION = {
 }
 LINKEDIN_JOB_DETAILS_DIV_DATA_VIEW_NAME = {"data-view-name": "job-detail-page"}
 LINKEDIN_KEY_SEPARATOR = "::"
-LINKEDIN_DEFAULT_COOKIE_FILE = "linkedin_cookies.json"
+DEFAULT_COOKIE_FILE = "linkedin_cookies.json"
 LINKEDIN_AUTH_COOKIES = ("bscookie", "li_at", "li_rm",)
 
 logger = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ class LinkedInFetcherService(IJobsFetcherService):
     Args:
         IJobsFetcherService (_type_): interface
     """
-    def __init__(self, username: str=None, password: str=None, cookiesFileDir: str = LINKEDIN_DEFAULT_COOKIE_FILE, headless: bool = False):
+    def __init__(self, username: str=None, password: str=None, cookiesFileDir: str = DEFAULT_COOKIE_FILE, headless: bool = False):
         """Create a LinkedIn Fetching service.
 
         Args:
@@ -93,7 +93,7 @@ class LinkedInFetcherService(IJobsFetcherService):
             if self.username is not None:
                 logger.debug(f"LinkedIn Service initialized with the username {self.username}")
             elif os.getenv("LIN_KEY"):
-                logger.debug(f"Found a key for LinkedIn: {os.getenv("LIN_KEY")}")
+                logger.debug("Found a key for LinkedIn in environment variables.")
                 self.username = Encoder.decodeString(os.getenv("LIN_KEY")).split(LINKEDIN_KEY_SEPARATOR)[0]
                 logger.debug(f"LinkedIn Service initialized with the environment variable username {self.username}")
             else:

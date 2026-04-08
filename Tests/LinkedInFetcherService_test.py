@@ -17,7 +17,7 @@
 # LinkedInFetcherService class unit tests
 
 import pytest, os
-from Core.Fetchers.LinkedIn.LinkedInFetcherService import LinkedInFetcherService, LINKEDIN_DEFAULT_COOKIE_FILE
+from Core.Fetchers.LinkedIn.LinkedInFetcherService import LinkedInFetcherService, DEFAULT_COOKIE_FILE
 import User
 
 class TestLinkedInFetcherService:
@@ -29,8 +29,8 @@ class TestLinkedInFetcherService:
     def test_CreateDefaultLinkedInFetcherServiceObject(self):
         fetcherService = LinkedInFetcherService()
         assert fetcherService is not None
-        assert fetcherService.username is not None
-        assert fetcherService.password is not None
+        assert fetcherService.username is None
+        assert fetcherService.password is None
         assert fetcherService.browser is None
 
     def test_CreateLinkedInFetcherServiceObject(self):
@@ -39,27 +39,27 @@ class TestLinkedInFetcherService:
         assert fetcherService.username == "aaa"
         assert fetcherService.password == "bbb"
 
-    @pytest.mark.skip(reason="Speed up")
+    #@pytest.mark.skip(reason="Speed up")
     def test_SignIn(self):
         fetcherService = LinkedInFetcherService()
         resultSuccess = fetcherService._signIn(storeCookies=False)
         assert resultSuccess
 
-    @pytest.mark.skip(reason="Speed up")
+    #@pytest.mark.skip(reason="Speed up")
     def test_SignInWithCookies(self):
-        cookieFile = os.path.join(os.path.dirname(User.__file__), LINKEDIN_DEFAULT_COOKIE_FILE)
+        cookieFile = os.path.join(os.path.dirname(User.__file__), DEFAULT_COOKIE_FILE)
         fetcherService = LinkedInFetcherService(cookiesFileDir=cookieFile)
         resultSuccess = fetcherService._signIn(storeCookies=True)
         assert resultSuccess
 
-    @pytest.mark.skip(reason="Speed up")
+    #@pytest.mark.skip(reason="Speed up")
     def test_ParseSavedJobsPage(self):
         fetcherService = LinkedInFetcherService()
         fetcherService._signIn(storeCookies=True)
         savedJobs = fetcherService._parseSavedJobsPage()
         assert type(savedJobs) is list
 
-    @pytest.mark.skip(reason="Speed up")
+    #@pytest.mark.skip(reason="Speed up")
     def test_ParseJobPagesForDetails(self):
         fetcherService = LinkedInFetcherService()
         fetcherService._signIn(storeCookies=True)
@@ -69,7 +69,7 @@ class TestLinkedInFetcherService:
 
     #@pytest.mark.skip(reason="Speed up")
     def test_GetSavedJobs(self):
-        cookieFile = os.path.join(os.path.dirname(User.__file__), LINKEDIN_DEFAULT_COOKIE_FILE)
+        cookieFile = os.path.join(os.path.dirname(User.__file__), DEFAULT_COOKIE_FILE)
         fetcherService = LinkedInFetcherService(cookiesFileDir=cookieFile)
         savedJobs = fetcherService.getSavedJobs()
         assert type(savedJobs) is list

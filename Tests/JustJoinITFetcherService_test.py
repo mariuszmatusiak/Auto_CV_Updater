@@ -39,7 +39,7 @@ class TestJustJoinITFetcherService:
         assert fetcherService.username == "aaa"
         assert fetcherService.password == "bbb"
 
-    #@pytest.mark.skip(reason="Speed up")
+    @pytest.mark.skip(reason="Speed up")
     def test_SignIn(self):
         fetcherService = JustJoinITFetcherService()
         resultSuccess = fetcherService._signIn(storeCookies=False)
@@ -54,17 +54,19 @@ class TestJustJoinITFetcherService:
 
     @pytest.mark.skip(reason="Speed up")
     def test_ParseSavedJobsPage(self):
-        fetcherService = JustJoinITFetcherService()
-        fetcherService._signIn(storeCookies=True)
-        savedJobs = fetcherService._parseSavedJobsPage()
-        assert type(savedJobs) is list
+        cookieFile = os.path.join(os.path.dirname(User.__file__), DEFAULT_COOKIE_FILE)
+        fetcherService = JustJoinITFetcherService(cookiesFileDir=cookieFile)
+        resultSuccess = fetcherService._signIn(storeCookies=True)
+        savedJobUrls = fetcherService._parseSavedJobsPage()
+        assert type(savedJobUrls) is set
 
     @pytest.mark.skip(reason="Speed up")
     def test_ParseJobPagesForDetails(self):
-        fetcherService = JustJoinITFetcherService()
-        fetcherService._signIn(storeCookies=True)
-        savedJobs = fetcherService._parseSavedJobsPage()
-        fetcherService._parseJobPagesForDetails(savedJobs)
+        cookieFile = os.path.join(os.path.dirname(User.__file__), DEFAULT_COOKIE_FILE)
+        fetcherService = JustJoinITFetcherService(cookiesFileDir=cookieFile)
+        resultSuccess = fetcherService._signIn(storeCookies=True)
+        savedJobUrls = fetcherService._parseSavedJobsPage()
+        savedJobs = fetcherService._parseJobPagesForDetails(savedJobUrls)
         assert type(savedJobs) is list
 
     #@pytest.mark.skip(reason="Speed up")

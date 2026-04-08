@@ -21,7 +21,8 @@ from enum import StrEnum, Enum
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.safari.service import Service
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException, InvalidCookieDomainException, UnableToSetCookieException
 
 from Utils.FileHandler import readJsonFile
 
@@ -44,7 +45,21 @@ class WebDriver(Enum):
 class SUPPORTED_WEBBROWSERS(StrEnum):
     SAFARI = "Safari"
     FIREFOX = "Firefox"
-    CHROMIUM = "Chromium"
+    CHROMIUM = "Chrome"
+
+class HtmlField:
+    def __init__(self, tag : str = None, id : str = None, name : str = None, class_ : str = None,
+                 type_ : str = None, otherAttributes : dict = None, index : int = 0,
+                 cssSelector : str = None, xPath : str = None):
+        self.tag = tag
+        self.id = id  # unique
+        self.name = name
+        self.class_ = class_
+        self.type_ = type_
+        self.otherAttributes = otherAttributes
+        self.index = index
+        self.cssSelector = cssSelector # unique
+        self.xPath = xPath # unique
 
 logger = logging.getLogger(__name__)
 
@@ -92,8 +107,13 @@ class WebBrowser:
         cookies = readJsonFile(cookiesFile)
         if cookies:
             for cookie in cookies:
-                self.webDriver.add_cookie(cookie_dict=cookie)
-                logger.debug(f"Added cookie \"{cookie['name']}\":\"{cookie['value']}\"")
+                try:
+                    self.webDriver.add_cookie(cookie_dict=cookie)
+                    logger.debug(f"Added cookie \"{cookie['name']}\":\"{cookie['value']}\"")
+                except InvalidCookieDomainException as e:
+                    logger.error(f"Error: {e.msg}")
+                except UnableToSetCookieException as e:
+                    logger.error(f"Error: {e.msg}")
             time.sleep(WEBDRIVER_SETUP_SLEEP_TIME)
         else:
             logger.error("No cookies were added!")
@@ -107,44 +127,59 @@ class WebBrowser:
         logger.debug(f"Getting cookie {name}")
         return self.webDriver.get_cookie(name)
 
-    def getField(self, fieldId: str = None, fieldCssSelector: str = None, fieldName : str = None, fieldType : str = None, index : int = 0):
+    def getField(self, fieldData: HtmlField):
+        # Start with unique selectors, then try with the rest of the provided parameters
         field = None
-        if fieldId:
-            fields = self.webDriver.find_elements(By.ID, fieldId)
-            if len(fields > 1):
-                logger.warning(f"There are multiple web elements with ID {fieldId}. Returning fields[{index}]")
-            field = fields[index]
-        elif fieldName:
-            fields = self.webDriver.find_elements(By.NAME, fieldName)
-            if len(fields > 1):
-                logger.warning(f"There are multiple web elements with NAME {fieldName}. Returning fields[{index}]")
-            field = fields[index]
-        elif fieldType:
-            fields = self.webDriver.find_elements(By.TAG_NAME, fieldType)
-            if len(fields > 1):
-                logger.warning(f"There are multiple web elements with TYPE {fieldName}. Returning fields[{index}]")
-            field = fields[index]
-        elif fieldCssSelector:
-            fields = self.webDriver.find_elements(By.CSS_SELECTOR, fieldCssSelector)
-            if len(fields > 1):
-                logger.warning(f"There are multiple web elements with TYPE {fieldName}. Returning fields[{index}]")
-            field = fields[index]
+        if fieldData.id:
+            field = self.webDriver.find_element(By.ID, fieldData.id)
+        elif fieldData.cssSelector:
+            field = self.webDriver.find_element(By.CSS_SELECTOR, fieldData.cssSelector)
+        elif fieldData.xPath:
+            field = self.webDriver.find_element(By.XPATH, fieldData.xPath)
         else:
+            logger.debug(f"No unique selector provided. Trying serching by other attributes.")
+            if fieldData.name:
+                fields = self.webDriver.find_elements(By.NAME, fieldData.name)
+                if len(fields) > 1:
+                    logger.warning(f"There are multiple web elements with NAME {fieldData.name}. Returning fields[{fieldData.index}]")
+                field = fields[fieldData.index]
+            elif fieldData.tag:
+                fields = self.webDriver.find_elements(By.TAG_NAME, fieldData.tag)
+                if len(fields) > 1:
+                    logger.warning(f"There are multiple web elements with TAG {fieldData.tag}. Returning fields[{fieldData.index}]")
+                field = fields[fieldData.index]
+            elif fieldData.class_:
+                fields = self.webDriver.find_elements(By.CLASS_NAME, fieldData.class_)
+                if len(fields) > 1:
+                    logger.warning(f"There are multiple web elements with CLASS {fieldData.class_}. Returning fields[{fieldData.index}]")
+                field = fields[fieldData.index]
+        if field is None:
             logger.error("No field ID or CSS selector provided.")
-            field = self.webDriver.find
         return field
 
-    def clickField(self, fieldId: str = None, fieldCssSelector: str = None, wait=True):
-        field = self.getField(fieldId, fieldCssSelector)
+    def clickField(self, webElement: WebElement = None, fieldData: HtmlField = None, wait=True):
+        if webElement:
+            field = webElement
+        elif fieldData:
+            field = self.getField(fieldData=fieldData)
+        else:
+            logger.error("Cannot find the valid field!")
+            return
         if field:
             field.click()
         if wait:
             time.sleep(WEBDRIVER_PAGE_LOAD_SLEEP_TIME)
 
-    def fillOutField(self, arg: str, fieldId: str = None, fieldCssSelector: str = None):
-        field = self.getField(fieldId, fieldCssSelector)
+    def fillOutField(self, argument: str, webElement: WebElement = None, fieldData: HtmlField = None):
+        if webElement:
+            field = webElement
+        elif fieldData:
+            field = self.getField(fieldData=fieldData)
+        else:
+            logger.error("Cannot find the valid field!")
+            return
         if field:
-            field.send_keys(arg)
+            field.send_keys(argument)
 
     def getCurrentPageSource(self):
         return self.webDriver.page_source
