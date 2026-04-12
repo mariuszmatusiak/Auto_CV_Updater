@@ -66,6 +66,7 @@ class CmdLineParser:
         parser.add_argument("-sf",  "--skills_file", help="Specify the name of the LaTeX CV skills file in the <CV_Templates_dir>/data/ directory to be used.", required=False, default="04_skills.tex")
         parser.add_argument("-sj",  "--skills_json", help="Specify the path to the JSON skills file to be used.", required=False, default=os.path.join("User", "skills.json"))
         parser.add_argument("-lc",  "--linkedin_cookies", help="Specify the path to the JSON file with LinkedIn authentication cookies.", required=False, default=os.path.join("User", "linkedin_cookies.json"))
+        parser.add_argument("-jc",  "--justJoinIt_cookies", help="Specify the path to the JSON file with JustJoinIT authentication cookies.", required=False, default=os.path.join("User", "justjoinit_cookies.json"))
         parser.add_argument("-b",   "--browser", help="Specify the web browser to use. Default=%(default)s", choices=SUPPORTED_WEBBROWSERS, default=SUPPORTED_WEBBROWSERS.FIREFOX)
         parser.add_argument("-hl",  "--headless", help="Specify if you want to run process in the background (no display)", action="store_true")
         args = parser.parse_args()
@@ -99,7 +100,8 @@ class CmdLineParser:
             headless=args.headless,
             cv_dir=cv_dir,
             make_exec=make_exec,
-            linkedInCookies=args.linkedin_cookies
+            linkedInCookies=args.linkedin_cookies,
+            justJoinItCookies=args.justJoinIt_cookies
         )
         logger.debug(self.environmentConfig)
 
