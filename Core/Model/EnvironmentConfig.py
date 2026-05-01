@@ -27,7 +27,7 @@ class SUPPORTED_VARIABLES:
 class EnvironmentConfig:
     def __init__(self, sync: bool, skill_areas : list, recipient_file : str,
                  skills_file : str, skills_json : str, browser: SUPPORTED_WEBBROWSERS, headless : bool, cv_dir : str, make_exec : str,
-                 linkedInCookies):
+                 linkedInCookies, justJoinItCookies):
         self.cv_dir = cv_dir
         self.sync = sync
         self.skill_areas = skill_areas
@@ -42,5 +42,10 @@ class EnvironmentConfig:
                 "login": None,
                 "password": None,
                 "cookies": linkedInCookies
+            },
+            "justJoinIt" : {
+                "login": None,
+                "password": None,
+                "cookies": justJoinItCookies
             }
         }

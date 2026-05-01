@@ -24,6 +24,7 @@ from Core.Model.Job import Job
 from Core.Model.EnvironmentConfig import EnvironmentConfig
 from Core.Fetchers.IJobsFetcherService import IJobsFetcherService
 from Core.Fetchers.LinkedIn.LinkedInFetcherService import LinkedInFetcherService
+from Core.Fetchers.JustJoinIT.JustJoinITFetcherService import JustJoinITFetcherService
 # To define and import more services here if needed
 
 class JobFetcher:
@@ -37,13 +38,19 @@ class JobFetcher:
             cookiesFileDir=args.services["linkedIn"]["cookies"],
             headless=args.headless
         ))
+        self.services.append(JustJoinITFetcherService(
+            username=args.services["justJoinIt"]["login"],
+            password=args.services["justJoinIt"]["password"],
+            cookiesFileDir=args.services["justJoinIt"]["cookies"],
+            headless=args.headless
+        ))
+        # TODO Add other services if needed like Indeed, pracuj.pl, etc.
 
     def checkMySavedJobs(self) -> list[Job]:
         savedJobs = []
         for fetcherService in self.services:
-            self.logger.info("Getting My Saved Jobs from LinkedIn...\n")
+            self.logger.info(f"Getting My Saved Jobs from {fetcherService.websiteName}...\n")
             savedJobs.extend(fetcherService.getSavedJobs())
-        # TODO Add other services if needed like Indeed, pracuj.pl, etc.
         return savedJobs
 
     def prepareJobDataOffline(self, args) -> list[Job]:

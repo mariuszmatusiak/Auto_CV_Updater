@@ -120,7 +120,10 @@ class ResumeUpdater:
             self._rebuildCVs()
 
     def _toFileName(self, arg: str):
-        return escapeFileSystemCharacters(arg.lower())
+        if arg is not None:
+            return escapeFileSystemCharacters(arg.lower())
+        else:
+            return ""
 
     def _rebuildCVs(self) -> None:
         lowerCasedCompanyName = self._toFileName(self._getField(LaTeXResumeField.COMPANY))
