@@ -21,7 +21,7 @@
 # Version 1.0, 2025-03-27 - The initial version.
 #
 
-from Core.Fetchers.IJobsFetcherService import *
+from Core.Fetchers.IJobsOnlineFetcherService import *
 from Core.Model.WebBrowser import HtmlField
 
 from bs4 import BeautifulSoup
@@ -53,7 +53,7 @@ DEFAULT_COOKIE_FILE = "justjoinit_cookies.json"
 
 logger = logging.getLogger(__name__)
 
-class JustJoinITFetcherService(IJobsFetcherService):
+class JustJoinITFetcherService(IJobsOnlineFetcherService):
     """JustJoinIT Fetching Service class. Implements the IJobsFetcherService interface.
     """
     def __init__(self, username: str=None, password: str=None, cookiesFileDir: str = DEFAULT_COOKIE_FILE, headless: bool = False):

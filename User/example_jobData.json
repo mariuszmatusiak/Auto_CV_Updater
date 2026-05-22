@@ -1,0 +1,22 @@
+[
+    {
+        "company": "Chris Big Corp",
+        "job": "Food quality tester",
+        "location": "Chris' mansion",
+        "url": "https://www.chrisbigcorp.co/careers/food-quality-tester-role",
+        "details": "Do you like food and have 10+ years of experience in eating? Then contact with us!",
+        "cover_letter_recipient": null,
+        "cover_letter_address": null,
+        "visa_required": false
+    },
+    {
+        "company": "Eeyore's Clinic of Mental Wellbeing",
+        "job": "Mental supporting friend",
+        "location": "Eeyore's Padock St. 12",
+        "url": "https://www.eeyoreclinic.com/roles/supporting-friend-role",
+        "details": "We need someone to listen to our complaints. If you feel you are the right candidate, please fill the form.",
+        "cover_letter_recipient": null,
+        "cover_letter_address": null,
+        "visa_required": false
+    }
+]

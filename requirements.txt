@@ -1,3 +1,4 @@
+anyascii==0.3.3
 beautifulsoup4==4.14.2
 requests==2.32.5
 selenium==4.38.0

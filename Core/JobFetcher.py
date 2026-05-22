@@ -22,7 +22,7 @@
 import logging
 from Core.Model.Job import Job
 from Core.Model.EnvironmentConfig import EnvironmentConfig
-from Core.Fetchers.IJobsFetcherService import IJobsFetcherService
+from Core.Fetchers.IJobsOnlineFetcherService import IJobsOnlineFetcherService
 from Core.Fetchers.LinkedIn.LinkedInFetcherService import LinkedInFetcherService
 from Core.Fetchers.JustJoinIT.JustJoinITFetcherService import JustJoinITFetcherService
 # To define and import more services here if needed

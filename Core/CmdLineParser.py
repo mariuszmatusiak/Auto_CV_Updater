@@ -59,7 +59,8 @@ class CmdLineParser:
         parser.add_argument("-u",   "--url", help="Specify the job URL", required=False)
         parser.add_argument("-sa",  "--skill_area", help="Specify skill area(s) (groups) to include in the resume", required=False, action="append")
         # Get environment config details
-        parser.add_argument("-s",   "--sync", help="Prepare CVs based on the list of saved jobs. Supports: LinkedIn.", required=False, action="store_true")
+        parser.add_argument("-s",   "--sync", help="Prepare CVs based on the list of saved jobs. Supports: LinkedIn, JustJoinIT", required=False, action="store_true")
+        parser.add_argument("-jb",  "--job_file", help="Prepare CVs based on the list of jobs saved in the JSON file.", required=False, action="store_true")
         parser.add_argument("-env", "--environment", help="Specify the path to the user .env file. This will overwrite existing environment variables.", required=False)
         parser.add_argument("-cv",  "--cv_dir", help="Specify the path to the <CV_Templates_dir> directory", required=False)
         parser.add_argument("-rf",  "--recipient_file", help="Specify the name of the LaTeX CV recipient file in the <CV_Templates_dir>/data/ directory to be used.", required=False, default="12_recipients.tex")
