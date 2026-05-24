@@ -20,24 +20,35 @@
 # Version 1.0, 2025-03-27 - The initial version.
 
 from Core.Model.Job import Job
-
-from abc import abstractmethod, ABCMeta
+from Core.Fetchers.IJobsFetcherService import IJobsFetcherService
+from Utils.FileHandler import readJsonFile
 
 import logging
 
 logger = logging.getLogger(__name__)
 
-class IJobsFetcherService(metaclass=ABCMeta):
-    """An interface to fetch jobs through various methods.
-    Implement this interface in your class while adding support to job details gathering methods.
+JSON_FETCHER_SERVICE_NAME = "JSON file offline"
 
-    Args:
-        ABC (ABCMeta): Standard Python Abstract Base Class.
-    """
+class JsonFileFetcherService(IJobsFetcherService):
 
-    def __init__(self):
-        self.fetcherName = "Abstract Fetcher Service Name"
+    def __init__(self, jobsJsonFilePath: str):
+        super().__init__()
+        self.fetcherName = JSON_FETCHER_SERVICE_NAME
+        self.jobsJsonFilePath = jobsJsonFilePath
 
-    @abstractmethod
     def getSavedJobs(self) -> list[Job]:
-        pass
+        jsonFileJobList = readJsonFile(self.jobsJsonFilePath)
+        jobList = []
+        for element in jsonFileJobList:
+            newJob = Job(
+                company=element["company"],
+                job=element["job"],
+                location=element["location"],
+                url=element["url"],
+                details=element["details"],
+                letterRecipient=element["cover_letter_recipient"],
+                letterAddress=element["cover_letter_address"],
+                isVisaRequired=element["visa_required"]
+            )
+            jobList.append(newJob)
+        return jobList

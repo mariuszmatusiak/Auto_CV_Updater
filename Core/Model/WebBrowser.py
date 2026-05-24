@@ -70,9 +70,9 @@ class WebBrowser:
         if selectedBrowser:
             self.initialize(selectedBrowser)
 
-    def __del__(self):
-        logger.debug("Disposing a created WebBrowser instance.")
-        self.dispose()
+    # def __del__(self):
+    #    logger.debug("Disposing a created WebBrowser instance.")
+    #    self.dispose()
 
     def initialize(self, selectedBrowser: SUPPORTED_WEBBROWSERS = SUPPORTED_WEBBROWSERS.FIREFOX):
         logger.info(f"Initializing webdriver, headless mode enabled: {self.headless}.")

@@ -24,7 +24,7 @@ class LoggerSetup:
     FILE_LOGGING_ENCODING = "utf-8"
 
     def __init__(self):
-        self.timestamp = datetime.now().strftime("%Y%m%d")
+        self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     def init(self, toConsole: bool, toFile: bool, level=logging.DEBUG):
         # Get and configure the root logger
@@ -32,7 +32,7 @@ class LoggerSetup:
         rootLogger.setLevel(level)
         if toConsole:
             consoleHandler = logging.StreamHandler()
-            consoleHandler.setLevel(logging.INFO)
+            # consoleHandler.setLevel(logging.INFO)
             consoleHandler.setFormatter(
                 logging.Formatter("%(name)s %(levelname)s %(message)s")
             )

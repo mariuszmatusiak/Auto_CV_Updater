@@ -16,6 +16,7 @@
 #
 
 from enum import Enum
+from anyascii import anyascii
 import logging
 
 logger = logging.getLogger(__name__)
@@ -70,8 +71,11 @@ class Job:
     def toEncodedByteSequence(param: str) -> bytes:
         return param.encode(encoding=Job.OUTPUT_ENCODING, errors=Job.OUTPUT_ENCODING_ERROR_HANDLING.IGNORE)
 
-    def escapeLatexCharacters(self, text: str):
-        return text.translate(Job.LATEX_CHARS_TO_ESCAPE_TRANSTABLE)
+    def escapeLatexCharacters(self, text: str) -> str:
+        # First cast any Unicode to ascii
+        asciiText = anyascii(text)
+        # Secondly, cast to LaTeX compatible string
+        return asciiText.translate(Job.LATEX_CHARS_TO_ESCAPE_TRANSTABLE)
 
     def _formatAsALatexField(self, arg: str | bool):
         # Perform a set of operations to preprocess text as a
