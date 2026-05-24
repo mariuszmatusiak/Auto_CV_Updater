@@ -22,9 +22,9 @@
 import logging
 from Core.Model.Job import Job
 from Core.Model.EnvironmentConfig import EnvironmentConfig
-from Core.Fetchers.IJobsOnlineFetcherService import IJobsOnlineFetcherService
 from Core.Fetchers.LinkedIn.LinkedInFetcherService import LinkedInFetcherService
 from Core.Fetchers.JustJoinIT.JustJoinITFetcherService import JustJoinITFetcherService
+from Core.Fetchers.JsonFile.JsonFileFetcherService import JsonFileFetcherService
 # To define and import more services here if needed
 
 class JobFetcher:
@@ -32,6 +32,9 @@ class JobFetcher:
     def __init__(self, args: EnvironmentConfig):
         self.services = []
         self.logger = logging.getLogger().getChild("Core.JobFetcher")
+        self.services.append(JsonFileFetcherService(
+            jobsJsonFilePath=args.services["jsonFile"]["jobs_file"]
+        ))
         self.services.append(LinkedInFetcherService(
             username=args.services["linkedIn"]["login"],
             password=args.services["linkedIn"]["password"],
@@ -49,7 +52,7 @@ class JobFetcher:
     def checkMySavedJobs(self) -> list[Job]:
         savedJobs = []
         for fetcherService in self.services:
-            self.logger.info(f"Getting My Saved Jobs from {fetcherService.websiteName}...\n")
+            self.logger.info(f"Getting My Saved Jobs from {fetcherService.fetcherName}...\n")
             savedJobs.extend(fetcherService.getSavedJobs())
         return savedJobs
 

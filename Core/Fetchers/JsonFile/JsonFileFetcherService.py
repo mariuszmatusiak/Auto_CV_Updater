@@ -27,11 +27,28 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+JSON_FETCHER_SERVICE_NAME = "JSON file offline"
+
 class JsonFileFetcherService(IJobsFetcherService):
 
     def __init__(self, jobsJsonFilePath: str):
+        super().__init__()
+        self.fetcherName = JSON_FETCHER_SERVICE_NAME
         self.jobsJsonFilePath = jobsJsonFilePath
 
     def getSavedJobs(self) -> list[Job]:
         jsonFileJobList = readJsonFile(self.jobsJsonFilePath)
-        print(jsonFileJobList)
+        jobList = []
+        for element in jsonFileJobList:
+            newJob = Job(
+                company=element["company"],
+                job=element["job"],
+                location=element["location"],
+                url=element["url"],
+                details=element["details"],
+                letterRecipient=element["cover_letter_recipient"],
+                letterAddress=element["cover_letter_address"],
+                isVisaRequired=element["visa_required"]
+            )
+            jobList.append(newJob)
+        return jobList

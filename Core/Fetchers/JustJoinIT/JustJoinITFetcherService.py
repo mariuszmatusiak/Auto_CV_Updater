@@ -58,7 +58,7 @@ class JustJoinITFetcherService(IJobsOnlineFetcherService):
     """
     def __init__(self, username: str=None, password: str=None, cookiesFileDir: str = DEFAULT_COOKIE_FILE, headless: bool = False):
         super().__init__(username, password, cookiesFileDir, headless)
-        self.websiteName = JOB_WEBSITE
+        self.fetcherName = JOB_WEBSITE
         self.mainPage = MAIN_PAGE
         self.mySavedJobsPages = MY_SAVED_JOBS_PAGES
         self.mySavedJobsRow = MY_SAVED_JOBS_ROW

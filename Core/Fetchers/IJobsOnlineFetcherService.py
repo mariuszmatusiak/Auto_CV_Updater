@@ -42,6 +42,7 @@ class IJobsOnlineFetcherService(IJobsFetcherService):
     """
 
     def __init__(self, username: str=None, password: str=None, cookiesFileDir: str = None, headless: bool = False):
+        super().__init__()
         self.username = username
         self.password = password
         self.cookiesFileDir = cookiesFileDir
@@ -49,7 +50,6 @@ class IJobsOnlineFetcherService(IJobsFetcherService):
         self.browser = None
         # Members to be overriden by the inheriting services:
         self.mainPage = "www.website.com"
-        self.websiteName = "Abstract Website Service"
         self.mySavedJobsPages = ("",)
         self.mySavedJobsRow = HtmlField()
         self.envKeyName = ""
@@ -114,22 +114,22 @@ class IJobsOnlineFetcherService(IJobsFetcherService):
 
     def _retrieveCredentials(self):
         if self.username is not None:
-            logger.debug(f"{self.websiteName} Service initialized with the username {self.username}")
+            logger.debug(f"{self.fetcherName} Service initialized with the username {self.username}")
         elif os.getenv(self.envKeyName):
-            logger.debug(f"Found a key for {self.websiteName} in environment variables.")
+            logger.debug(f"Found a key for {self.fetcherName} in environment variables.")
             self.username = Encoder.decodeString(os.getenv(self.envKeyName)).split(self.envKeySeparator)[0]
-            logger.debug(f"{self.websiteName} Service initialized with the environment variable username {self.username}")
+            logger.debug(f"{self.fetcherName} Service initialized with the environment variable username {self.username}")
         else:
-            self.username = input(f"Enter {self.websiteName} username: ")
-            logger.debug(f"{self.websiteName} Service initialized with the user-provided username {self.username}")
+            self.username = input(f"Enter {self.fetcherName} username: ")
+            logger.debug(f"{self.fetcherName} Service initialized with the user-provided username {self.username}")
         if self.password is not None:
-            logger.debug(f"{self.websiteName} Service initialized with the given password")
+            logger.debug(f"{self.fetcherName} Service initialized with the given password")
         elif os.getenv(self.envKeyName):
             self.password = Encoder.decodeString(os.getenv(self.envKeyName)).split(self.envKeySeparator)[1]
-            logger.debug(f"{self.websiteName} Service initialized with the environment variable password")
+            logger.debug(f"{self.fetcherName} Service initialized with the environment variable password")
         else:
-            self.password = getpass.getpass(prompt=f"Enter {self.websiteName} password: ", echo_char="*")
-            logger.debug(f"{self.websiteName} Service initialized with the user-provided password")
+            self.password = getpass.getpass(prompt=f"Enter {self.fetcherName} password: ", echo_char="*")
+            logger.debug(f"{self.fetcherName} Service initialized with the user-provided password")
         return self.username, self.password
 
     def _authenticateWithCredentials(self):
@@ -167,7 +167,7 @@ class IJobsOnlineFetcherService(IJobsFetcherService):
             # Save all cookies from the current session
             sessionCookies = self.browser.getCookies()
         writeJsonFile(self.cookiesFileDir, sessionCookies)
-        logger.info(f"Stored {self.websiteName} cookies in the {self.cookiesFileDir} file")
+        logger.info(f"Stored {self.fetcherName} cookies in the {self.cookiesFileDir} file")
         return True # TODO Add error handling
 
     def _signIn(self, storeCookies=True) -> bool:
@@ -195,7 +195,7 @@ class IJobsOnlineFetcherService(IJobsFetcherService):
                         jobUrl = self._extractJobUrlFromHtml(row)
                         savedJobsUrls.add(jobUrl)
                 else:
-                    logger.warning(f"No saved jobs found on {self.websiteName}!")
+                    logger.warning(f"No saved jobs found on {self.fetcherName}!")
             except NoSuchElementException as e:
                 logger.error("No element: {}\nStack trace: \n{}".format(e.msg, e.stacktrace))
                 break

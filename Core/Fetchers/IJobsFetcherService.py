@@ -36,7 +36,7 @@ class IJobsFetcherService(metaclass=ABCMeta):
     """
 
     def __init__(self):
-        pass
+        self.fetcherName = "Abstract Fetcher Service Name"
 
     @abstractmethod
     def getSavedJobs(self) -> list[Job]:
