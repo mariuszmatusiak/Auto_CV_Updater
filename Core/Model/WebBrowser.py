@@ -16,8 +16,9 @@
 #
 #
 
-import logging, time, json
+import logging, time, json, requests
 from enum import StrEnum, Enum
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.safari.service import Service
@@ -63,12 +64,37 @@ class HtmlField:
 
 logger = logging.getLogger(__name__)
 
-class WebBrowser:
+class WebShell:
+
+    def __init__(self):
+        self.requestResponse = None
+
+    def visit(self, url : str) -> bool:
+        self.requestResponse = requests.get(url)
+        if self.requestResponse.status_code == 200:
+            return True
+        else:
+            logger.error(f"Returned status code for page {url} is {self.requestResponse.status_code}")
+            return False
+
+    def getCurrentPageSource(self) -> str:
+        return self.requestResponse.text
+
+    def _getCurrentPageAsSoup(self):
+        return BeautifulSoup(self.getCurrentPageSource(), "html.parser")
+
+    def getCurrentPageText(self) -> str:
+        bs = self._getCurrentPageAsSoup()
+        return bs.get_text("\n", strip=True)
+
+class WebBrowser(WebShell):
 
     def __init__(self, selectedBrowser: SUPPORTED_WEBBROWSERS = None, headless: bool = False):
         self.headless = headless
         if selectedBrowser:
             self.initialize(selectedBrowser)
+        else:
+            self.initialize(selectedBrowser=SUPPORTED_WEBBROWSERS.FIREFOX)
 
     # def __del__(self):
     #    logger.debug("Disposing a created WebBrowser instance.")
@@ -98,9 +124,14 @@ class WebBrowser:
             self.webDriver = None
         logger.info(f"Webdriver {selectedBrowser} initialized.")
 
-    def visit(self, url):
+    def visit(self, url : str) -> bool:
         self.webDriver.get(url) # We must first visit the page before adding cookies (cookie-averse document error)
         time.sleep(WEBDRIVER_PAGE_LOAD_SLEEP_TIME) # wait for page to load
+        # Scroll down to the bottom of the page
+        SCROLLING_JS_SCRIPT = "window.scrollTo(0, document.body.scrollHeight)"
+        self.webDriver.execute_script(SCROLLING_JS_SCRIPT)
+        time.sleep(WEBDRIVER_PAGE_LOAD_SLEEP_TIME/5)
+        return True
 
     def addCookiesFromFile(self, cookiesFile):
         logger.debug(f"Loading cookies from file {cookiesFile}")
@@ -181,7 +212,7 @@ class WebBrowser:
         if field:
             field.send_keys(argument)
 
-    def getCurrentPageSource(self):
+    def getCurrentPageSource(self) -> str:
         return self.webDriver.page_source
 
     def getCurrentPageTitleAndUrl(self):
@@ -191,4 +222,19 @@ class WebBrowser:
         if self.webDriver is not None:
             self.webDriver.close()
             self.webDriver.quit()
-            self.webDriver = None
+            # self.webDriver = None
+
+# A decorator to be used whenever WebBrowser is needed. TODO To update
+def withWebBrowser(cls):
+    class_constructor = cls.__init__
+    def overridden_constructor(self, *args, **kwargs):
+        class_constructor(self, *args, **kwargs)
+        cls.browser = None
+    def _initWebBrowser(self):
+        if self.browser is None:
+            self.browser = WebBrowser(SUPPORTED_WEBBROWSERS.FIREFOX, self.headless)
+            return True
+        else:
+            return False
+    cls.__init__ = overridden_constructor
+    cls._initWebBrowser = _initWebBrowser

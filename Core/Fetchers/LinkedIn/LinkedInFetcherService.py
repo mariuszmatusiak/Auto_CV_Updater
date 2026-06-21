@@ -33,7 +33,9 @@ JOB_WEBSITE = "LinkedIn"
 MAIN_PAGE = "https://www.linkedin.com/"
 LOGIN_PAGE = "https://www.linkedin.com/login/"
 POST_LOGIN_PAGE = "https://www.linkedin.com/feed/"
-MY_SAVED_JOBS_PAGES = ("https://www.linkedin.com/my-items/saved-jobs/",) #"https://www.linkedin.com/my-items/saved-jobs/?cardType=SAVED&start=<PAGE>0"
+MY_SAVED_JOBS_PAGES = ("https://www.linkedin.com/my-items/saved-jobs/?cardType=SAVED",
+                       "https://www.linkedin.com/my-items/saved-jobs/?cardType=SAVED&start=10",
+                       "https://www.linkedin.com/my-items/saved-jobs/?cardType=SAVED&start=20") #"https://www.linkedin.com/my-items/saved-jobs/?cardType=SAVED&start=<PAGE>0"
 #SIGNIN_BUTTON = HtmlField(tag="button", type_="button")
 SIGNIN_BUTTON = HtmlField(cssSelector=".btn__primary--large")
 SIGNIN_USERNAME_FIELD = HtmlField(id="username")

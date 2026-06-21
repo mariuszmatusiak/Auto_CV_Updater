@@ -25,6 +25,7 @@ from Core.Model.EnvironmentConfig import EnvironmentConfig
 from Core.Fetchers.LinkedIn.LinkedInFetcherService import LinkedInFetcherService
 from Core.Fetchers.JustJoinIT.JustJoinITFetcherService import JustJoinITFetcherService
 from Core.Fetchers.JsonFile.JsonFileFetcherService import JsonFileFetcherService
+from Core.Fetchers.AI.LLMFetcherService import LLMFetcherService
 # To define and import more services here if needed
 
 class JobFetcher:
@@ -32,6 +33,11 @@ class JobFetcher:
     def __init__(self, args: EnvironmentConfig):
         self.services = []
         self.logger = logging.getLogger().getChild("Core.JobFetcher")
+        self.services.append(LLMFetcherService(
+            jobUrls=args.services["llm"]["jobUrls"],
+            model=args.services["llm"]["model"],
+            apiKey=args.services["llm"]["apiKey"]
+        ))
         self.services.append(JsonFileFetcherService(
             jobsJsonFilePath=args.services["jsonFile"]["jobs_file"]
         ))
@@ -52,8 +58,9 @@ class JobFetcher:
     def checkMySavedJobs(self) -> list[Job]:
         savedJobs = []
         for fetcherService in self.services:
-            self.logger.info(f"Getting My Saved Jobs from {fetcherService.fetcherName}...\n")
-            savedJobs.extend(fetcherService.getSavedJobs())
+            with fetcherService as fs:
+                self.logger.info(f"Getting My Saved Jobs from {fs.fetcherName}...\n")
+                savedJobs.extend(fs.getSavedJobs())
         return savedJobs
 
     def prepareJobDataOffline(self, args) -> list[Job]:

@@ -17,17 +17,20 @@
 #
 
 from Core.Model.WebBrowser import SUPPORTED_WEBBROWSERS
+from Core.Fetchers.AI.LLMFetcherService import SUPPORTED_LLMS
 from enum import StrEnum
 
 class SUPPORTED_VARIABLES:
     CV_DIR = "CV_DIR"
     LINKEDIN_KEY = "LIN_KEY"
+    JUSTJOINIT_KEY = "JJIT_KEY"
     MAKE_EXEC = "MAKE_BIN"
+    OPEN_AI_KEY = "CV_OAI_KEY"
 
 class EnvironmentConfig:
     def __init__(self, sync: bool, skill_areas : list, recipient_file : str,
                  skills_file : str, skills_json : str, browser: SUPPORTED_WEBBROWSERS, headless : bool, cv_dir : str, make_exec : str,
-                 jobs_file : str, linkedInCookies, justJoinItCookies):
+                 jobs_file : str, llm_jobUrls: list[str], llm_model: SUPPORTED_LLMS, llm_ApiKey : str, linkedInCookies, justJoinItCookies):
         self.cv_dir = cv_dir
         self.sync = sync
         self.skill_areas = skill_areas
@@ -50,5 +53,10 @@ class EnvironmentConfig:
             },
             "jsonFile" : {
                 "jobs_file" : jobs_file
+            },
+            "llm" : {
+                "model" : llm_model,
+                "jobUrls" : llm_jobUrls,
+                "apiKey" : llm_ApiKey
             }
         }

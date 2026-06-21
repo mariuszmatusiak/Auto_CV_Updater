@@ -56,9 +56,15 @@ class IJobsOnlineFetcherService(IJobsFetcherService):
         self.envKeySeparator = ""
         self.validSignInTargetPage = None # A page that is displayed only when a user is signed in.
 
-    # Let's leave the default destructor
-    # def __del__(self):
-    #    del self.browser
+    def __enter__(self):
+        logger.debug(f"Entered {self.fetcherName} Fetcher Service object")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        logger.debug(f"Cleaning up {self.fetcherName} Fetcher Service object")
+        if self.browser is not None:
+            self.browser.dispose()
+            logger.debug("WebBrowser instance closed.")
 
     @abstractmethod
     def _extractJobUrlFromHtml(self, htmlJobDetails) -> str:

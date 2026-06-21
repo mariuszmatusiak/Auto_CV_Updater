@@ -30,6 +30,7 @@ from Core.Model.EnvironmentConfig import EnvironmentConfig, SUPPORTED_VARIABLES
 from Core.Model.WebBrowser import SUPPORTED_WEBBROWSERS
 from Core.Model.Job import Job
 from Core.Model.ErrorCodes import ERROR_CODES
+from Core.Fetchers.AI.LLMFetcherService import SUPPORTED_LLMS
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +57,12 @@ class CmdLineParser:
         parser.add_argument("-v",   "--visa", dest="isVisaRequired", help="Specify if visa sponsorship is needed.", required=False, action="store_true")
         parser.add_argument("-r",   "--letter_recipient", dest="letterRecipient", help="Specify the cover letter recipient", required=False)
         parser.add_argument("-a",   "--letter_address", dest="letterAddress", help="Specify the cover letter address", required=False)
-        parser.add_argument("-u",   "--url", help="Specify the job URL", required=False)
+        parser.add_argument("-u",   "--url", help="Specify the job URL(s)", action="append")
         parser.add_argument("-sa",  "--skill_area", help="Specify skill area(s) (groups) to include in the resume", required=False, action="append")
         # Get environment config details
         parser.add_argument("-s",   "--sync", help="Prepare CVs based on the list of saved jobs. Supports: LinkedIn, JustJoinIT", required=False, action="store_true")
         parser.add_argument("-jf",  "--job_file", help="Prepare CVs based on the list of jobs saved in the JSON file.", required=False, default=os.path.join("User", "example_jobData.json"))
+        parser.add_argument("-lo",  "--link_only", help="Prepare CVs based on the URL only, using LLM (experimental). Requires -u flag.", required=False, action="store_true")
         parser.add_argument("-env", "--environment", help="Specify the path to the user .env file. This will overwrite existing environment variables.", required=False)
         parser.add_argument("-cv",  "--cv_dir", help="Specify the path to the <CV_Templates_dir> directory", required=False)
         parser.add_argument("-rf",  "--recipient_file", help="Specify the name of the LaTeX CV recipient file in the <CV_Templates_dir>/data/ directory to be used.", required=False, default="12_recipients.tex")
@@ -68,7 +70,8 @@ class CmdLineParser:
         parser.add_argument("-sj",  "--skills_json", help="Specify the path to the JSON skills file to be used.", required=False, default=os.path.join("User", "skills.json"))
         parser.add_argument("-lc",  "--linkedin_cookies", help="Specify the path to the JSON file with LinkedIn authentication cookies.", required=False, default=os.path.join("User", "linkedin_cookies.json"))
         parser.add_argument("-jc",  "--justJoinIt_cookies", help="Specify the path to the JSON file with JustJoinIT authentication cookies.", required=False, default=os.path.join("User", "justjoinit_cookies.json"))
-        parser.add_argument("-b",   "--browser", help="Specify the web browser to use. Default=%(default)s", choices=SUPPORTED_WEBBROWSERS, default=SUPPORTED_WEBBROWSERS.FIREFOX)
+        parser.add_argument("-b",   "--browser", help="Specify the web browser to be used. Default=%(default)s", choices=SUPPORTED_WEBBROWSERS, default=SUPPORTED_WEBBROWSERS.FIREFOX)
+        parser.add_argument("-lm",  "--llm_model", help="Specify the LLM model to be used. Default=%(default)s", choices=SUPPORTED_LLMS, default=SUPPORTED_LLMS.CHAT_GPT)
         parser.add_argument("-hl",  "--headless", help="Specify if you want to run process in the background (no display)", action="store_true")
         args = parser.parse_args()
         # Store job details
@@ -76,7 +79,7 @@ class CmdLineParser:
             company=args.company,
             job=args.job,
             location=args.location,
-            url=args.url,
+            url=args.url if args.url is None else args.url[0],
             details=args.description,
             letterAddress=args.letterAddress,
             letterRecipient=args.letterRecipient,
@@ -102,6 +105,9 @@ class CmdLineParser:
             cv_dir=cv_dir,
             make_exec=make_exec,
             jobs_file=args.job_file,
+            llm_jobUrls=args.url if args.link_only and args.url is not None else [],
+            llm_model=args.llm_model,
+            llm_ApiKey=os.getenv(SUPPORTED_VARIABLES.OPEN_AI_KEY),
             linkedInCookies=args.linkedin_cookies,
             justJoinItCookies=args.justJoinIt_cookies
         )

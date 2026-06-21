@@ -38,6 +38,13 @@ class IJobsFetcherService(metaclass=ABCMeta):
     def __init__(self):
         self.fetcherName = "Abstract Fetcher Service Name"
 
+    def __enter__(self):
+        logger.debug(f"Entered {self.fetcherName} Fetcher Service object")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        logger.debug(f"Cleaning up {self.fetcherName} Fetcher Service object")
+
     @abstractmethod
     def getSavedJobs(self) -> list[Job]:
         pass
